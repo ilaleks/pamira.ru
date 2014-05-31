@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /css/
+Disallow: /download/
+Disallow: /images/
+Disallow: /includes/
+Disallow: /js/
+Disallow: /sources/
+Disallow: /template/
+Sitemap: http://www.pamira.ru/sitemap.xml
+Host: www.pamira.ru
