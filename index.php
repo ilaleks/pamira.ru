@@ -1,11 +1,6 @@
 <?php
 
-$tablesPrefix = 'pamira_';
-	
-$dbhost="u330431.mysql.masterhost.ru";
-$dbuser="u330431";
-$dbpass="6_4OCkstE-eS";
-$dbname="u330431";	
+require_once('includes/config.php');
 	
 $mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
 	
@@ -70,7 +65,7 @@ if (isset($_POST['catalog']) && isset($_POST['submit'])) {
 	if (isset($_POST['min'])) $where .= " AND TOV.cost >= ".$_POST['min'];
 	if (isset($_POST['max'])) $where .= " AND TOV.cost <= ".$_POST['max'];
 
-	$query = "SELECT CAT.name_lat as catalog, PODCAT1.name_lat as podcatalog1, PODCAT2.name_lat as podcatalog2, TOV.name_lat, TOV.name_rus, TOV.img, TOV.cost 
+	$query = "SELECT TOV.id as id, CAT.name_lat as catalog, PODCAT1.name_lat as podcatalog1, PODCAT2.name_lat as podcatalog2, TOV.name_lat, TOV.name_rus, TOV.img, TOV.cost 
 FROM ".$tablesPrefix."tovar as TOV 
 LEFT JOIN ".$tablesPrefix."catalog as CAT 
 ON CAT.id = TOV.id_cat 
@@ -136,8 +131,8 @@ ON PODCAT2.id = TOV.id_podcat2 AND PODCAT2.id_podcat = PODCAT1.id ".$where."
 //			print "@@<pre>";
 //                        print_r($_SESSION);
 //                        print "</pre>!!";
-                        
-                        echo '<div class="box2"><a title="" href="'.$href.'"><img alt="" src="'.$img.'"></a><span id="spannook2">'.$cost.'</span><br /><br /><a title="" href="'.$href.'">'.$title.'</a></div>';
+                        //echo '<div class="box2"><a title="" href="'.$href.'"><img alt="" src="'.$img.'"></a><span id="spannook2">'.$cost.'</span><br /><br /><a title="" href="'.$href.'">'.$title.'</a></div>';
+                        echo '<div class="box2"><a title="" href="'.$href.'"><img alt="" src="'.$img.'"></a><span id="spannook2">'.$cost.'</span><span id="spanaddcart2" onclick="addtovar(\''.$data['id'].'\', \'www.pamira.ru\');"  title="Купить"><img src="/images/button_buy1.gif" border="0" alt="" /></span><span id="compare" onclick="addcompare(\''.$data['id'].'\', \'www.pamira.ru\');" title="В сравнение">В сравнение</span><a title="" href="'.$href.'">'.$title.'</a></div>';
 		}
 		$result->close();            
 	}
@@ -590,12 +585,17 @@ Shadowbox.init();
 
 </head>
 <?php
+        $viewcompare = (isset($t[compare])) ? 'viewcompare(\''.$httphost.'\');' : '';
 	switch($page)
 	{
 		case 'cart':
-			if($_POST['sk']==0) echo '<body onLoad="getcart(\''.$httphost.'\');">';
-			if($_POST['sk']==1) echo '<body onLoad="getcart_sk(\''.$httphost.'\');">';
+			if($_POST['sk']==0) echo '<body onLoad="getcart(\''.$httphost.'\');'.$viewcompare.'">';
+			if($_POST['sk']==1) echo '<body onLoad="getcart_sk(\''.$httphost.'\');'.$viewcompare.'">';
 		break;
+                
+                case 'compare':
+                    echo '<body onLoad="viewcart(\''.$httphost.'\');">';
+                break;
 		/*
 		case 'str_designer':
 			if($_SESSION['desi']==1)
@@ -606,7 +606,7 @@ Shadowbox.init();
 		*/
 		default:
 			//echo '<body>';
-			echo '<body onLoad="viewcart(\''.$httphost.'\');">';
+                        echo '<body onLoad="viewcart(\''.$httphost.'\');'.$viewcompare.'">';
 		break;
 	}
 ?>
@@ -780,6 +780,11 @@ if(($id=='posudomoechnye-mashiny')and($id1==''))
 		case 'cart':
 				require ($basedir."/sources/cart.php");
 		break;
+            
+                case 'compare':
+				require ($basedir."/sources/compare.php");
+		break;
+            
 		case 'ordermake':
 				require ($basedir."/sources/ordermake.php");
 		break;
@@ -816,7 +821,7 @@ if(($id=='posudomoechnye-mashiny')and($id1==''))
        <!--end content-->  
        <!--start right_bar-->
        <td id="right_bar">
-             <span id="viewcart"></span>
+             <span id="viewcart"></span><span id="viewcompare"></span>
 <?php                
 if(($page!='article')and($page!='str_designer') && notAuth())
 {
